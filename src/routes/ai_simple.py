@@ -3,6 +3,7 @@ from src.models.student import Student, db
 from src.models.progress import Progress
 from src.models.content import Content
 from src.models.ai_personalization import AIPersonalization
+from src.models.user import User
 from datetime import datetime
 import json
 import random
@@ -209,6 +210,7 @@ def generate_simple_learning_path(student_id, subject):
 def get_dashboard_data(student_id):
     """Fornece dados para o dashboard do estudante"""
     student = Student.query.get_or_404(student_id)
+    user = User.query.get(student.user_id)
     progress_records = Progress.query.filter_by(student_id=student_id).order_by(Progress.created_at.desc()).limit(10).all()
     
     # Calcular métricas
@@ -252,7 +254,7 @@ def get_dashboard_data(student_id):
     
     return jsonify({
         'student': {
-            'name': student.name,
+            'name': user.username if user else '',
             'grade': student.grade_level,
             'total_progress': int(avg_score),
             'weekly_goal': int(weekly_goal),
