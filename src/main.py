@@ -132,7 +132,20 @@ def init_database():
     """Inicializa banco de dados e popula com dados padrão"""
     with app.app_context():
         try:
-            # Criar todas as tabelas
+  # Importar todos os modelos para garantir que sejam registrados
+    from src.models.user import User
+    from src.models.student import Student
+    from src.models.teacher import Teacher
+    from src.models.content import Content
+    from src.models.progress import Progress
+    from src.models.ai_personalization import AIPersonalization
+    from src.models.problem_of_day import ProblemOfDay
+    from src.models.ai_tutor_chat import AITutorChat
+    from src.models.gamification import (
+        StudentProgress, Achievement, StudentAchievement, 
+        StudyStreak, StudentPoints, ActivityLog
+    )
+    
             db.create_all()
             print("✅ Tabelas do banco de dados criadas com sucesso!")
             
