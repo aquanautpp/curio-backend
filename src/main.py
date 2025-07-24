@@ -3,7 +3,7 @@ import sys
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request
 from flask_cors import CORS
 from src.models.user import db
 from src.routes.user import user_bp
@@ -46,7 +46,12 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-@app.route('/', defaults={'path': ''})
+@app.before_request
+def check_api_route():
+    if request.path.startswith('/api/'):
+        return # Let the blueprints handle API routes
+
+@app.route('/', defaults={'path': ''}) 
 @app.route('/<path:path>')
 def serve(path):
     static_folder_path = app.static_folder
