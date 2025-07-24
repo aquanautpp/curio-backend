@@ -150,7 +150,7 @@ class AIPersonalizationEngine:
         if not avg_scores:
             return 'medium'
         
-        # Encontrar o nível de dificuldade com melhor performance
+        # Avaliar desempenho por dificuldade e ajustar recomendação
         best_difficulty = max(avg_scores, key=avg_scores.get)
         
         # Se a performance em 'hard' for boa (>80), recomendar 'hard'
