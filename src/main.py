@@ -28,7 +28,21 @@ database_url = os.environ.get("DATABASE_URL")
 if database_url:
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 else:
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///src/database/app.db"
+    # Tentar criar banco na pasta do projeto, senão usar /tmp
+    try:
+        db_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "database")
+        os.makedirs(db_dir, exist_ok=True)
+        db_path = os.path.join(db_dir, "app.db")
+        # Testar se consegue escrever no diretório
+        test_file = os.path.join(db_dir, "test.tmp")
+        with open(test_file, 'w') as f:
+            f.write("test")
+        os.remove(test_file)
+        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+    except (OSError, PermissionError):
+        # Se não conseguir escrever, usar /tmp
+        db_path = "/tmp/curio_app.db"
+        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
