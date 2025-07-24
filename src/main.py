@@ -140,7 +140,7 @@ def init_database():
             from src.models.progress import Progress
             from src.models.ai_personalization import AIPersonalization
             from src.models.problem_of_day import ProblemOfDay
-            from src.models.ai_tutor_chat import AITutorChat
+            from src.models.ai_tutor_chat import ChatMessage  # ← MUDANÇA AQUI
             from src.models.gamification import (
                 StudentProgress, Achievement, StudentAchievement, 
                 StudyStreak, StudentPoints, ActivityLog
