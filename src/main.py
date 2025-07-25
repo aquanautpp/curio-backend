@@ -132,9 +132,26 @@ def init_database():
     """Inicializa banco de dados e popula com dados padrão"""
     with app.app_context():
         try:
+            # ORDEM CORRETA - tabelas base primeiro
+            from src.models.user import User
+            from src.models.teacher import Teacher  # ← ANTES de content
+            from src.models.student import Student
+            from src.models.content import Content  # ← DEPOIS de teacher
+            from src.models.progress import Progress
+            from src.models.ai_personalization import AIPersonalization
+            from src.models.problem_of_day import ProblemOfDay
+            from src.models.ai_tutor_chat import ChatMessage
+            from src.models.gamification import (
+                StudentProgress, Achievement, StudentAchievement, 
+                StudyStreak, StudentPoints, ActivityLog
+            )
+            
             # Criar todas as tabelas
             db.create_all()
             print("✅ Tabelas do banco de dados criadas com sucesso!")
+            
+        except Exception as e:
+            print(f"❌ Erro ao criar tabelas: {e}")
             
             # Importar modelos de gamificação
             from src.models.gamification import Achievement
