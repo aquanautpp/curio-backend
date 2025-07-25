@@ -10,6 +10,10 @@ from src.models.user import User
 from src.models.teacher import Teacher
 from src.models.student import Student
 from src.models.content import Content 
+# Imports dos blueprints
+from src.routes.user import user_bp
+from src.routes.student import student_bp
+from src.routes.content import content_bp
 from src.routes.ai_personalization import ai_bp
 from src.routes.ai_simple import ai_simple_bp
 from src.routes.problem_of_day_optimized import problem_bp
