@@ -290,8 +290,8 @@ if __name__ == "__main__":
     print(f"🔌 Porta: {port}")
     print(f"🔧 Debug: {debug}")
     print(f"🐦 Curió está pronto para voar!")
+    
+    app.run(host=host, port=port, debug=debug)
 
 from src.routes.content_explorer import content_explorer_bp
 app.register_blueprint(content_explorer_bp, url_prefix="/api")
-    
-    app.run(host=host, port=port, debug=debug)
