@@ -6,9 +6,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from flask import Flask, send_from_directory, jsonify
 from flask_cors import CORS
 from src.models.user import db
-from src.routes.user import user_bp
-from src.routes.student import student_bp
-from src.routes.content import content_bp
+from src.models.user import User
+from src.models.teacher import Teacher
+from src.models.student import Student
+from src.models.content import Content 
 from src.routes.ai_personalization import ai_bp
 from src.routes.ai_simple import ai_simple_bp
 from src.routes.problem_of_day_optimized import problem_bp
