@@ -1,8 +1,9 @@
-from flask_sqlalchemy import SQLAlchemy
+# Importações necessárias
 from datetime import datetime, timedelta
 import json
 
-db = SQLAlchemy()
+# Em vez de criar uma nova instância, importamos o `db` já existente
+from src.models.user import db
 
 class StudentProgress(db.Model):
     __tablename__ = 'student_progress'
