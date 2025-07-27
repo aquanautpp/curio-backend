@@ -237,38 +237,38 @@ class AITutorEngine:
         else:
             return self._generate_educational_response(student_message)
 
-    # Constrói o histórico para a API da OpenAI
-    messages = [
-        {"role": "system", "content": "Você é um tutor educacional amigável chamado Curió."}
-    ]
-    for msg in conversation_history:
-        role = "user" if msg["sender"] == "student" else "assistant"
-        messages.append({"role": role, "content": msg["message"]})
+        # Constrói o histórico para a API da OpenAI
+        messages = [
+            {"role": "system", "content": "Você é um tutor educacional amigável chamado Curió."}
+        ]
+        for msg in conversation_history:
+            role = "user" if msg["sender"] == "student" else "assistant"
+            messages.append({"role": role, "content": msg["message"]})
 
-    # Mensagem atual do estudante
-    messages.append({"role": "user", "content": student_message})
+        # Mensagem atual do estudante
+        messages.append({"role": "user", "content": student_message})
 
-    # Adiciona contexto do problema, se houver
-    if problem_context:
-        context_text = (
-            f"Contexto do problema: {problem_context['title']} "
-            f"(categoria: {problem_context['category']}, dificuldade: {problem_context['difficulty']})."
-        )
-        messages.append({"role": "system", "content": context_text})
+        # Adiciona contexto do problema, se houver
+        if problem_context:
+            context_text = (
+                f"Contexto do problema: {problem_context['title']} "
+                f"(categoria: {problem_context['category']}, dificuldade: {problem_context['difficulty']})."
+            )
+            messages.append({"role": "system", "content": context_text})
 
-    try:
-        completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            max_tokens=200,
-            temperature=0.7
-        )
-        answer = completion.choices[0].message.content.strip()
-        return {"message": answer, "type": "text"}
-    except Exception:
-        # Em caso de erro com a API, cai na resposta didática antiga
-        return self._generate_educational_response(student_message)
-        
+        try:
+            completion = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=messages,
+                max_tokens=200,
+                temperature=0.7
+            )
+            answer = completion.choices[0].message.content.strip()
+            return {"message": answer, "type": "text"}
+        except Exception:
+            # Em caso de erro com a API, cai na resposta didática antiga
+            return self._generate_educational_response(student_message)
+       
     def _analyze_student_message(self, message):
         """
         Analisa a mensagem do estudante para determinar o tipo de resposta.
