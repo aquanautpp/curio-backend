@@ -15,6 +15,9 @@ from src.routes.problem_of_day_optimized import problem_bp
 from src.routes.ai_tutor_chat_optimized import tutor_chat_bp
 from src.routes.gamification import gamification_bp
 from src.routes.dashboard import dashboard_bp
+from src.routes.cpa_demo import cpa_demo_bp
+from src.routes.metacognition import metacognition_bp
+from src.routes.reports import reports_bp
 
 app = Flask(__name__)
 
@@ -64,6 +67,9 @@ app.register_blueprint(problem_bp, url_prefix="/api")
 app.register_blueprint(tutor_chat_bp, url_prefix="/api")
 app.register_blueprint(gamification_bp, url_prefix="/api/gamification")
 app.register_blueprint(dashboard_bp, url_prefix="/api")
+app.register_blueprint(cpa_demo_bp, url_prefix="/api")
+app.register_blueprint(metacognition_bp, url_prefix="/api")
+app.register_blueprint(reports_bp, url_prefix="/api")
 
 # Servir arquivos estáticos do frontend (se existirem)
 @app.route('/')
