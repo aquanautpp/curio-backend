@@ -1,58 +1,74 @@
+# src/routes/problem_of_day.py
+from flask import Blueprint, jsonify, request
+from src.models.problem_of_day import ProblemOfDay, ProblemSubmission
 from src.models.user import db
 from datetime import datetime
+import json
+import random
 
-class ProblemOfDay(db.Model):
-    __tablename__ = 'problems_of_day'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text, nullable=False)
-    category = db.Column(db.String(100), nullable=False)  # e.g., "personal_finance", "logic", "data_analysis"
-    difficulty = db.Column(db.String(50), nullable=False)  # e.g., "beginner", "intermediate", "advanced"
-    expected_answer = db.Column(db.Text, nullable=True)  # Optional expected answer
-    solution_hints = db.Column(db.Text, nullable=True)  # JSON string with hints
-    resources = db.Column(db.Text, nullable=True)  # JSON string with additional resources
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
-    is_active = db.Column(db.Boolean, default=True)
-    
-    # Relationship with student submissions
-    submissions = db.relationship('ProblemSubmission', backref='problem', lazy=True)
-    
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'title': self.title,
-            'description': self.description,
-            'category': self.category,
-            'difficulty': self.difficulty,
-            'expected_answer': self.expected_answer,
-            'solution_hints': self.solution_hints,
-            'resources': self.resources,
-            'date_created': self.date_created.isoformat() if self.date_created else None,
-            'is_active': self.is_active
-        }
+problem_day_bp = Blueprint('problem_day', __name__)
 
-class ProblemSubmission(db.Model):
-    __tablename__ = 'problem_submissions'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
-    problem_id = db.Column(db.Integer, db.ForeignKey('problems_of_day.id'), nullable=False)
-    answer = db.Column(db.Text, nullable=False)
-    is_correct = db.Column(db.Boolean, nullable=True)  # Can be evaluated later
-    time_spent = db.Column(db.Integer, nullable=True)  # Time in minutes
-    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
-    feedback = db.Column(db.Text, nullable=True)  # AI-generated feedback
-    
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'student_id': self.student_id,
-            'problem_id': self.problem_id,
-            'answer': self.answer,
-            'is_correct': self.is_correct,
-            'time_spent': self.time_spent,
-            'submitted_at': self.submitted_at.isoformat() if self.submitted_at else None,
-            'feedback': self.feedback
-        }
+@problem_day_bp.route('/problems/today', methods=['GET'])
+def get_problem_of_day():
+    """
+    Retorna um problema do dia ativo. Seleciona aleatoriamente um entre os problemas ativos.
+    """
+    problems = ProblemOfDay.query.filter_by(is_active=True).all()
+    if not problems:
+        return jsonify({'success': False, 'error': 'No active problems available'}), 404
+    problem = random.choice(problems)
+    return jsonify({'success': True, 'problem': problem.to_dict()})
 
+@problem_day_bp.route('/problems/<int:problem_id>/submit', methods=['POST'])
+def submit_problem_answer(problem_id):
+    """
+    Recebe a resposta do aluno para um problema do dia.
+    Se a resposta for igual à esperada (ignora maiúsculas/minúsculas e espaços), marca como correta.
+    """
+    data = request.json or {}
+    student_id = data.get('student_id')
+    answer = (data.get('answer') or '').strip()
+    time_spent = data.get('time_spent')
+
+    problem = ProblemOfDay.query.get_or_404(problem_id)
+
+    # Avaliar resposta
+    is_correct = False
+    feedback = ''
+    if problem.expected_answer:
+        is_correct = answer.lower() == problem.expected_answer.strip().lower()
+        feedback = 'Resposta correta! Parabéns!' if is_correct else 'Resposta incorreta. Continue tentando.'
+
+    submission = ProblemSubmission(
+        student_id=student_id,
+        problem_id=problem_id,
+        answer=answer,
+        is_correct=is_correct,
+        time_spent=time_spent,
+        submitted_at=datetime.utcnow(),
+        feedback=feedback
+    )
+    db.session.add(submission)
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'is_correct': is_correct,
+        'feedback': feedback
+    })
+
+@problem_day_bp.route('/problems/<int:problem_id>/hint', methods=['GET'])
+def get_problem_hint(problem_id):
+    """
+    Retorna uma dica do problema. As dicas estão armazenadas como JSON em solution_hints.
+    Neste exemplo, devolvemos a primeira dica disponível.
+    """
+    problem = ProblemOfDay.query.get_or_404(problem_id)
+    if not problem.solution_hints:
+        return jsonify({'success': False, 'error': 'No hints available'}), 404
+    try:
+        hints = json.loads(problem.solution_hints)
+    except Exception:
+        hints = [problem.solution_hints]
+    hint = hints[0] if hints else 'No hints found'
+    return jsonify({'success': True, 'hint': hint})
