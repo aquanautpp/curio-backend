@@ -11,7 +11,7 @@ from src.routes.student import student_bp
 from src.routes.content import content_bp
 from src.routes.ai_personalization import ai_bp
 from src.routes.ai_simple import ai_simple_bp
-from src.routes.problem_of_day_optimized import problem_bp
+from src.routes.problem_of_day import problem_day_bp
 from src.routes.ai_tutor_chat_optimized import tutor_chat_bp
 from src.routes.gamification import gamification_bp
 from src.routes.dashboard import dashboard_bp
@@ -63,7 +63,7 @@ app.register_blueprint(student_bp, url_prefix="/api")
 app.register_blueprint(content_bp, url_prefix="/api")
 app.register_blueprint(ai_bp, url_prefix="/api")
 app.register_blueprint(ai_simple_bp, url_prefix="/api")
-app.register_blueprint(problem_bp, url_prefix="/api")
+app.register_blueprint(problem_day_bp, url_prefix='/api')
 app.register_blueprint(tutor_chat_bp, url_prefix="/api")
 app.register_blueprint(gamification_bp, url_prefix="/api/gamification")
 app.register_blueprint(dashboard_bp, url_prefix="/api")
