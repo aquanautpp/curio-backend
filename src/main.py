@@ -11,7 +11,7 @@ from src.routes.student import student_bp
 from src.routes.content import content_bp
 from src.routes.ai_personalization import ai_bp
 from src.routes.ai_simple import ai_simple_bp
-from src.routes.problem_of_day import problem_day_bp
+from src.routes.problem_of_day import problem_bp as problem_day_bp
 from src.routes.ai_tutor_chat_optimized import tutor_chat_bp
 from src.routes.gamification import gamification_bp
 from src.routes.dashboard import dashboard_bp
