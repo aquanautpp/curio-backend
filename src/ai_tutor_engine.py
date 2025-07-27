@@ -213,29 +213,29 @@ class AITutorEngine:
         Gera uma resposta do tutor baseada na mensagem do estudante.
         Agora funciona como um ChatGPT educacional amigável para crianças.
         """
-    # Se não houver chave da OpenAI, use a lógica antiga
-    if not openai.api_key:
-        student_message = student_message.lower().strip()
-        response_type = self._analyze_student_message(student_message)
+        # Se não houver chave da OpenAI, use a lógica antiga
+        if not openai.api_key:
+            student_message = student_message.lower().strip()
+            response_type = self._analyze_student_message(student_message)
 
-        if response_type == 'math_question':
-            return self._handle_math_question(student_message)
-        elif response_type == 'science_question':
-            return self._handle_science_question(student_message)
-        elif response_type == 'history_question':
-            return self._handle_history_question(student_message)
-        elif response_type == 'portuguese_question':
-            return self._handle_portuguese_question(student_message)
-        elif response_type == 'geography_question':
-            return self._handle_geography_question(student_message)
-        elif response_type == 'general_curiosity':
-            return self._handle_general_curiosity(student_message)
-        elif response_type == 'needs_encouragement':
-            return self._generate_encouragement(student_message)
-        elif response_type == 'greeting':
-            return self._handle_greeting(student_message)
-        else:
-            return self._generate_educational_response(student_message)
+            if response_type == 'math_question':
+                return self._handle_math_question(student_message)
+            elif response_type == 'science_question':
+                return self._handle_science_question(student_message)
+            elif response_type == 'history_question':
+                return self._handle_history_question(student_message)
+            elif response_type == 'portuguese_question':
+                return self._handle_portuguese_question(student_message)
+            elif response_type == 'geography_question':
+                return self._handle_geography_question(student_message)
+            elif response_type == 'general_curiosity':
+                return self._handle_general_curiosity(student_message)
+            elif response_type == 'needs_encouragement':
+                return self._generate_encouragement(student_message)
+            elif response_type == 'greeting':
+                return self._handle_greeting(student_message)
+            else:
+                return self._generate_educational_response(student_message)
 
         # Constrói o histórico para a API da OpenAI
         messages = [
