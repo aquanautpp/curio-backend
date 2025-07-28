@@ -4,9 +4,9 @@ import shutil
 import subprocess
 
 def build_and_copy_frontend():
-    frontend_path = "../curio-frontend"
+    frontend_path = "frontend"
     backend_static_path = "src/static"
-    vite_api_url = "https://curio-backend-1.onrender.com/api"  # ou pegue de variável de ambiente se preferir
+    vite_api_url = "https://curio-backend-1.onrender.com/api"  
 
     print("🚀 Fazendo build do frontend...")
 
