@@ -9,6 +9,7 @@ class ChatSession(db.Model):
     problem_id = db.Column(db.Integer, db.ForeignKey('problems_of_day.id'), nullable=True)
     session_start = db.Column(db.DateTime, default=datetime.utcnow)
     session_end = db.Column(db.DateTime, nullable=True)
+    last_activity = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
     
     # Relationship with chat messages
@@ -21,6 +22,7 @@ class ChatSession(db.Model):
             'problem_id': self.problem_id,
             'session_start': self.session_start.isoformat() if self.session_start else None,
             'session_end': self.session_end.isoformat() if self.session_end else None,
+            'last_activity': self.last_activity.isoformat() if self.last_activity else None,
             'is_active': self.is_active,
             'message_count': len(self.messages)
         }
