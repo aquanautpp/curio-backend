@@ -278,7 +278,7 @@ def init_database():
             print(f"❌ Erro ao inicializar banco de dados: {e}")
             db.session.rollback()
 
-# Criar tabelas do banco de dados
+# Inicializar banco de dados e criar tabelas
 init_database()
 
 if __name__ == "__main__":
