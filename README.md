@@ -29,7 +29,7 @@ git clone https://github.com/SEU_USUARIO/curio-backend.git
 cd curio-backend
 ```
 
-2. **Crie ambiente virtual**
+2. **Crie um ambiente virtual**
 ```bash
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
@@ -58,8 +58,8 @@ A API estará disponível em `http://localhost:5000`
 3. **Crie um novo Web Service**
 4. **Conecte seu repositório GitHub**
 5. **Configure as variáveis**:
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `python src/main.py`
+   - **Build Command**: `pip install -r requirements.txt && python build_frontend.py`
+   - **Start Command**: `gunicorn --config gunicorn.conf.py src.main:app`
    - **Environment**: `Python 3`
 
 ### Variáveis de Ambiente (Opcional)
