@@ -1,6 +1,6 @@
 import os
 import sys
-# DON\'T CHANGE THIS !!!
+# DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, send_from_directory, jsonify
@@ -19,21 +19,14 @@ from src.routes.cpa_demo import cpa_demo_bp
 from src.routes.metacognition import metacognition_bp
 from src.routes.reports import reports_bp
 
-app = Flask(__name__, static_folder=\'static\', static_url_path=\'\')
+app = Flask(__name__)
 
 # Configuração de produção
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "curio_secret_key_2024_#FGSgvasgf$5$WGT")
 app.config["ENV"] = os.environ.get("FLASK_ENV", "production")
 
-# ✅ MUDANÇA: Configurar CORS para permitir o frontend no mesmo domínio
-# Se o frontend agora está no próprio backend (curio-backend-1.onrender.com),
-# o CORS precisa permitir o próprio domínio. Remova referências a frontends separados.
-CORS(app, origins=[
-    "http://localhost:5173",  # Para desenvolvimento local
-    "https://curio-backend-1.onrender.com", # ✅ URL do seu serviço único (backend + frontend)
-    # "https://curio-frontend-1.onrender.com",  # ❌ REMOVER: Esta URL não é mais o frontend principal
-    # "*"  # ⚠️ REMOVER em produção para maior segurança, manter apenas para debug inicial
-])
+# Habilitar CORS para todas as rotas
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Configurar banco de dados
 database_url = os.environ.get("DATABASE_URL")
@@ -47,7 +40,7 @@ else:
         db_path = os.path.join(db_dir, "curio_app.db")
         # Testar se consegue escrever no diretório
         test_file = os.path.join(db_dir, "test.tmp")
-        with open(test_file, \'w\') as f:
+        with open(test_file, 'w') as f:
             f.write("test")
         os.remove(test_file)
         app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
@@ -70,7 +63,7 @@ app.register_blueprint(student_bp, url_prefix="/api")
 app.register_blueprint(content_bp, url_prefix="/api")
 app.register_blueprint(ai_bp, url_prefix="/api")
 app.register_blueprint(ai_simple_bp, url_prefix="/api")
-app.register_blueprint(problem_day_bp, url_prefix=\'/api\')
+app.register_blueprint(problem_day_bp, url_prefix='/api')
 app.register_blueprint(tutor_chat_bp, url_prefix="/api")
 app.register_blueprint(gamification_bp, url_prefix="/api/gamification")
 app.register_blueprint(dashboard_bp, url_prefix="/api")
@@ -79,12 +72,11 @@ app.register_blueprint(metacognition_bp, url_prefix="/api")
 app.register_blueprint(reports_bp, url_prefix="/api")
 
 # Servir arquivos estáticos do frontend (se existirem)
-# ✅ MUDANÇA: Rotas para servir o frontend. Mantenha apenas UMA ocorrência.
-@app.route(\'/\')
+@app.route('/')
 def serve_frontend():
     try:
-        return send_from_directory(app.static_folder, \'index.html\')
-    except FileNotFoundError:
+        return send_from_directory('static', 'index.html')
+    except:
         return jsonify({
             "message": "🐦 Curió Backend API está funcionando!",
             "status": "success",
@@ -96,30 +88,18 @@ def serve_frontend():
                 "Seções Educacionais Ativas",
                 "Cache e Performance Otimizada",
                 "Autenticação de Usuários"
-            ],
-            "note": "Frontend não encontrado. Certifique-se de que os arquivos buildados do frontend estão em src/static/"
+            ]
         })
 
-@app.route(\'/<path:path>\')
+@app.route('/<path:path>')
 def serve_static(path):
-    # Se a requisição for para uma rota da API, deixe o Flask lidar com ela
-    if path.startswith(\'api/\'):
-        return jsonify({"error": "API endpoint not found"}), 404
-    
     try:
-        return send_from_directory(app.static_folder, path)
-    except FileNotFoundError:
-        # Se o arquivo não existir (ex: rota de SPA), serve o index.html
-        try:
-            return send_from_directory(app.static_folder, \'index.html\')
-        except FileNotFoundError:
-            return jsonify({
-                "error": "Frontend não encontrado",
-                "message": "Faça o build do frontend e copie para src/static/"
-            }), 404
+        return send_from_directory('static', path)
+    except:
+        return jsonify({"message": "Arquivo não encontrado", "status": "error"}), 404
 
 # Rota de health check
-@app.route(\'/health\')
+@app.route('/health')
 def health_check():
     return jsonify({
         "status": "healthy",
@@ -130,7 +110,7 @@ def health_check():
     })
 
 # Rota de informações da API
-@app.route(\'/api\')
+@app.route('/api')
 def api_info():
     return jsonify({
         "api_name": "Curió Educational Platform API",
@@ -184,104 +164,104 @@ def init_database():
                 # Criar conquistas padrão
                 default_achievements = [
                     {
-                        \'name\': \'Primeiro Passo\',
-                        \'description\': \'Complete seu primeiro exercício na plataforma Curió\',
-                        \'icon\': \'play\',
-                        \'category\': \'progress\',
-                        \'requirement_type\': \'exercises_completed\',
-                        \'requirement_value\': 1,
-                        \'points\': 10,
-                        \'rarity\': \'common\'
+                        'name': 'Primeiro Passo',
+                        'description': 'Complete seu primeiro exercício na plataforma Curió',
+                        'icon': 'play',
+                        'category': 'progress',
+                        'requirement_type': 'exercises_completed',
+                        'requirement_value': 1,
+                        'points': 10,
+                        'rarity': 'common'
                     },
                     {
-                        \'name\': \'Curioso\',
-                        \'description\': \'Faça sua primeira pergunta ao tutor Curió\',
-                        \'icon\': \'brain\',
-                        \'category\': \'interaction\',
-                        \'requirement_type\': \'chat_messages\',
-                        \'requirement_value\': 1,
-                        \'points\': 5,
-                        \'rarity\': \'common\'
+                        'name': 'Curioso',
+                        'description': 'Faça sua primeira pergunta ao tutor Curió',
+                        'icon': 'brain',
+                        'category': 'interaction',
+                        'requirement_type': 'chat_messages',
+                        'requirement_value': 1,
+                        'points': 5,
+                        'rarity': 'common'
                     },
                     {
-                        \'name\': \'Dedicado\',
-                        \'description\': \'Estude por 3 dias consecutivos\',
-                        \'icon\': \'calendar\',
-                        \'category\': \'streak\',
-                        \'requirement_type\': \'streak_days\',
-                        \'requirement_value\': 3,
-                        \'points\': 25,
-                        \'rarity\': \'common\'
+                        'name': 'Dedicado',
+                        'description': 'Estude por 3 dias consecutivos',
+                        'icon': 'calendar',
+                        'category': 'streak',
+                        'requirement_type': 'streak_days',
+                        'requirement_value': 3,
+                        'points': 25,
+                        'rarity': 'common'
                     },
                     {
-                        \'name\': \'Persistente\',
-                        \'description\': \'Mantenha uma sequência de 7 dias de estudo\',
-                        \'icon\': \'target\',
-                        \'category\': \'streak\',
-                        \'requirement_type\': \'streak_days\',
-                        \'requirement_value\': 7,
-                        \'points\': 50,
-                        \'rarity\': \'rare\'
+                        'name': 'Persistente',
+                        'description': 'Mantenha uma sequência de 7 dias de estudo',
+                        'icon': 'target',
+                        'category': 'streak',
+                        'requirement_type': 'streak_days',
+                        'requirement_value': 7,
+                        'points': 50,
+                        'rarity': 'rare'
                     },
                     {
-                        \'name\': \'Explorador da Matemática\',
-                        \'description\': \'Complete 10 exercícios de matemática\',
-                        \'icon\': \'calculator\',
-                        \'category\': \'subject\',
-                        \'requirement_type\': \'subject_exercises\',
-                        \'requirement_value\': 10,
-                        \'points\': 30,
-                        \'rarity\': \'common\'
+                        'name': 'Explorador da Matemática',
+                        'description': 'Complete 10 exercícios de matemática',
+                        'icon': 'calculator',
+                        'category': 'subject',
+                        'requirement_type': 'subject_exercises',
+                        'requirement_value': 10,
+                        'points': 30,
+                        'rarity': 'common'
                     },
                     {
-                        \'name\': \'Cientista Curioso\',
-                        \'description\': \'Complete 10 atividades de ciências\',
-                        \'icon\': \'microscope\',
-                        \'category\': \'subject\',
-                        \'requirement_type\': \'subject_exercises\',
-                        \'requirement_value\': 10,
-                        \'points\': 30,
-                        \'rarity\': \'common\'
+                        'name': 'Cientista Curioso',
+                        'description': 'Complete 10 atividades de ciências',
+                        'icon': 'microscope',
+                        'category': 'subject',
+                        'requirement_type': 'subject_exercises',
+                        'requirement_value': 10,
+                        'points': 30,
+                        'rarity': 'common'
                     },
                     {
-                        \'name\': \'Maratonista\',
-                        \'description\': \'Estude por 30 dias consecutivos - um verdadeiro campeão!\',
-                        \'icon\': \'trophy\',
-                        \'category\': \'streak\',
-                        \'requirement_type\': \'streak_days\',
-                        \'requirement_value\': 30,
-                        \'points\': 200,
-                        \'rarity\': \'legendary\'
+                        'name': 'Maratonista',
+                        'description': 'Estude por 30 dias consecutivos - um verdadeiro campeão!',
+                        'icon': 'trophy',
+                        'category': 'streak',
+                        'requirement_type': 'streak_days',
+                        'requirement_value': 30,
+                        'points': 200,
+                        'rarity': 'legendary'
                     },
                     {
-                        \'name\': \'Mestre dos Pontos\',
-                        \'description\': \'Acumule 1000 pontos na plataforma\',
-                        \'icon\': \'zap\',
-                        \'category\': \'points\',
-                        \'requirement_type\': \'total_points\',
-                        \'requirement_value\': 1000,
-                        \'points\': 100,
-                        \'rarity\': \'rare\'
+                        'name': 'Mestre dos Pontos',
+                        'description': 'Acumule 1000 pontos na plataforma',
+                        'icon': 'zap',
+                        'category': 'points',
+                        'requirement_type': 'total_points',
+                        'requirement_value': 1000,
+                        'points': 100,
+                        'rarity': 'rare'
                     },
                     {
-                        \'name\': \'Tempo é Ouro\',
-                        \'description\': \'Dedique 10 horas aos estudos\',
-                        \'icon\': \'clock\',
-                        \'category\': \'time\',
-                        \'requirement_type\': \'study_time_hours\',
-                        \'requirement_value\': 10,
-                        \'points\': 75,
-                        \'rarity\': \'rare\'
+                        'name': 'Tempo é Ouro',
+                        'description': 'Dedique 10 horas aos estudos',
+                        'icon': 'clock',
+                        'category': 'time',
+                        'requirement_type': 'study_time_hours',
+                        'requirement_value': 10,
+                        'points': 75,
+                        'rarity': 'rare'
                     },
                     {
-                        \'name\': \'Lenda do Curió\',
-                        \'description\': \'Conquista especial para os maiores estudiosos\',
-                        \'icon\': \'crown\',
-                        \'category\': \'special\',
-                        \'requirement_type\': \'total_points\',
-                        \'requirement_value\': 5000,
-                        \'points\': 500,
-                        \'rarity\': \'legendary\'
+                        'name': 'Lenda do Curió',
+                        'description': 'Conquista especial para os maiores estudiosos',
+                        'icon': 'crown',
+                        'category': 'special',
+                        'requirement_type': 'total_points',
+                        'requirement_value': 5000,
+                        'points': 500,
+                        'rarity': 'legendary'
                     }
                 ]
                 
@@ -301,19 +281,16 @@ def init_database():
 # Criar tabelas do banco de dados
 init_database()
 
-# ✅ MUDANÇA: Comentar o bloco if __name__ == "__main__":
-# Este bloco deve ser COMENTADO ou REMOVIDO quando você usa Gunicorn para rodar a aplicação.
-# O Gunicorn é quem vai chamar o `app` diretamente, e a execução deste bloco pode causar conflitos.
-# if __name__ == "__main__":
-#     # Configuração para desenvolvimento local e produção
-#     port = int(os.environ.get("PORT", 5000))
-#     host = os.environ.get("HOST", "0.0.0.0")
-#     debug = os.environ.get("FLASK_ENV") == "development"
+if __name__ == "__main__":
+    # Configuração para desenvolvimento local e produção
+    port = int(os.environ.get("PORT", 5000))
+    host = os.environ.get("HOST", "0.0.0.0")
+    debug = os.environ.get("FLASK_ENV") == "development"
     
-#     print(f"🚀 Iniciando Curió Backend...")
-#     print(f"📍 Host: {host}")
-#     print(f"🔌 Porta: {port}")
-#     print(f"🔧 Debug: {debug}")
-#     print(f"🐦 Curió está pronto para voar!")
+    print(f"🚀 Iniciando Curió Backend...")
+    print(f"📍 Host: {host}")
+    print(f"🔌 Porta: {port}")
+    print(f"🔧 Debug: {debug}")
+    print(f"🐦 Curió está pronto para voar!")
     
-#     app.run(host=\'0.0.0.0\', port=port, debug=False)
+    app.run(host=host, port=port, debug=debug)
