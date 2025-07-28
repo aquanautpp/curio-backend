@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from src.models.ai_tutor_chat import ChatSession, ChatMessage, db
 from src.models.problem_of_day import ProblemOfDay
 from src.ai_tutor_engine import AITutorEngine
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import hashlib
 import json
