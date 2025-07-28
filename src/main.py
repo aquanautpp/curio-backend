@@ -27,10 +27,12 @@ app.config["ENV"] = os.environ.get("FLASK_ENV", "production")
 
 # Configurar CORS para permitir o frontend
 CORS(app, origins=[
-    "http://localhost:5173",
-    "https://curio-frontend-1.onrender.com",
-    "*" 
-] )
+    "http://localhost:5173",  # Desenvolvimento local
+    "https://curio-backend.onrender.com",  # Backend principal
+    "https://curio-backend-1.onrender.com",  # Backend secundário
+    "https://curio-frontend-1.onrender.com",  # Frontend (se existir)
+    "*"  # Temporário para debug
+])
 
 # Configurar banco de dados
 database_url = os.environ.get("DATABASE_URL")
