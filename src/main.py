@@ -19,14 +19,18 @@ from src.routes.cpa_demo import cpa_demo_bp
 from src.routes.metacognition import metacognition_bp
 from src.routes.reports import reports_bp
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='')
 
 # Configuração de produção
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "curio_secret_key_2024_#FGSgvasgf$5$WGT")
 app.config["ENV"] = os.environ.get("FLASK_ENV", "production")
 
-# Habilitar CORS para todas as rotas
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+# Configurar CORS para permitir o frontend
+CORS(app, origins=[
+    "http://localhost:5173",
+    "https://curio-frontend-1.onrender.com",
+    "*" 
+] )
 
 # Configurar banco de dados
 database_url = os.environ.get("DATABASE_URL")
@@ -308,5 +312,5 @@ if __name__ == "__main__":
     print(f"🔧 Debug: {debug}")
     print(f"🐦 Curió está pronto para voar!")
     
-    app.run(host=host, port=port, debug=debug)
+    app.run(host='0.0.0.0', port=port, debug=False)
 
