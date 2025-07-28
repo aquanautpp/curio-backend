@@ -17,10 +17,13 @@ def get_personalization(student_id):
         return jsonify({'message': 'No personalization data found'}), 404
     return jsonify(personalization.to_dict())
 
-@ai_bp.route('/ai/analyze/<int:student_id>', methods=['POST'])
+@ai_bp.route('/simple/analyze/<int:student_id>', methods=['POST'])
 def analyze_student(student_id):
-    """Analisar o progresso do estudante e atualizar personalização"""
-    student = Student.query.get_or_404(student_id)
+    student = Student.query.get(student_id)
+    if not student:
+        return jsonify({'error': 'Student not found'}), 404
+    analysis = perform_ai_analysis(student)
+    return jsonify(analysis)
 
     # Obter dados de progresso do estudante
     progress_records = Progress.query.filter_by(student_id=student_id).all()
