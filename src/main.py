@@ -281,6 +281,21 @@ def init_database():
 # Criar tabelas do banco de dados
 init_database()
 
+# Servir o frontend
+@app.route('/')
+def serve_frontend():
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    if path.startswith('api/'):
+        return {"error": "API endpoint not found"}, 404
+    
+    try:
+        return send_from_directory(app.static_folder, path)
+    except:
+        return send_from_directory(app.static_folder, 'index.html')
+
 if __name__ == "__main__":
     # Configuração para desenvolvimento local e produção
     port = int(os.environ.get("PORT", 5000))
