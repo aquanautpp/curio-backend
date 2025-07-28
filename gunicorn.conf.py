@@ -4,8 +4,9 @@ import multiprocessing
 
 # Configurações básicas
 bind = f"0.0.0.0:{os.environ.get('PORT', 5000)}"
-workers = min(4, (multiprocessing.cpu_count() * 2) + 1)
-worker_class = "sync"
+workers = int(os.environ.get("WEB_CONCURRENCY", "2"))
+worker_class = "gthread"
+threads = int(os.environ.get("WEB_THREADS", "2"))
 timeout = 120
 keepalive = 5
 
@@ -15,6 +16,6 @@ errorlog = "-"
 loglevel = "info"
 
 # Performance
-preload_app = True
+preload_app = False  # deixe False a menos que tenha certeza que conexões não são criadas no import
 max_requests = 1000
 max_requests_jitter = 100
