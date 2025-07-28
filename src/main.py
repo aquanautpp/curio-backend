@@ -3,8 +3,16 @@ import sys
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask, send_from_directory, jsonify
+from flask import Flask, send_from_directory, jsonify, make_response
 from flask_cors import CORS
+import pathlib
+
+ROOT = pathlib.Path(__file__).resolve().parent
+app = Flask(
+    __name__,
+    static_folder=str(ROOT / "static"),  # aponta para src/static
+    static_url_path="/"
+)
 from src.models.user import db
 from src.routes.user import user_bp
 from src.routes.student import student_bp
@@ -72,31 +80,43 @@ app.register_blueprint(metacognition_bp, url_prefix="/api")
 app.register_blueprint(reports_bp, url_prefix="/api")
 
 # Servir arquivos estáticos do frontend (se existirem)
-@app.route('/')
-def serve_frontend():
-    try:
-        return send_from_directory('static', 'index.html')
-    except:
-        return jsonify({
-            "message": "🐦 Curió Backend API está funcionando!",
-            "status": "success",
-            "version": "2.0.0",
-            "features": [
-                "AI Tutor Chat Otimizado",
-                "Sistema de Gamificação Completo",
-                "Dashboard Funcional",
-                "Seções Educacionais Ativas",
-                "Cache e Performance Otimizada",
-                "Autenticação de Usuários"
-            ]
-        })
+# Helpers de cache
+def _set_no_cache(resp):
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    return resp
 
-@app.route('/<path:path>')
-def serve_static(path):
+def _set_long_cache(resp):
+    resp.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+    return resp
+
+# SPA fallback: entrega arquivos estáticos se existirem;
+# senão, devolve index.html (exceto para /api/*)
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def spa(path):
+    # Nunca interceptar rotas da API
+    if path.startswith("api/"):
+        return jsonify({"error": "not found"}), 404
+
+    static_folder = app.static_folder
+
+    # Se pediu explicitamente index.html, devolve sem cache
+    if path == "" or path == "index.html":
+        resp = send_from_directory(static_folder, "index.html")
+        return _set_no_cache(resp)
+
+    # Tenta servir o arquivo estático solicitado
     try:
-        return send_from_directory('static', path)
-    except:
-        return jsonify({"message": "Arquivo não encontrado", "status": "error"}), 404
+        resp = send_from_directory(static_folder, path)
+        # Se tem extensão (ex: .js, .css, .png), usar cache longo
+        if "." in path:
+            return _set_long_cache(resp)
+        # Caso raro: rota sem ponto, mas existente -> no-cache
+        return _set_no_cache(resp)
+    except Exception:
+        # Fallback para SPA
+        resp = send_from_directory(static_folder, "index.html")
+        return _set_no_cache(resp)
 
 # Rota de health check
 @app.route('/health')
